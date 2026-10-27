@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EUR — Hoofdnavigatie prototype</title>
+  <!--
+    Museo Sans staat op Adobe Fonts (museo-sans). Voeg hier de kit toe, bv.:
+    <link rel="stylesheet" href="https://use.typekit.net/XXXXXXX.css">
+    Zonder kit valt de pagina terug op de systeemfont.
+  -->
+  <style>
+    /* ==========================================================
+       Tokens — afgeleid van EUR.NL Design System 2026 (Figma)
+       Vloeiende waarden lopen van 393px (mobiel) naar 1440px (desktop)
+       ========================================================== */
+    :root {
+      /* Kleur */
+      --color-ink: oklch(23.4% 0.04 208.6);          /* #002328 brand/wordmark, menu/background */
+      --color-surface: oklch(100% 0 0);              /* navbar/background */
+      --color-line: oklch(95.8% 0.005 34.3);         /* #f4f0ef navbar/border */
+      --color-line-dark: oklch(40.1% 0.05 201.1);    /* #225053 menu/item/border-hover */
+      --color-on-ink: oklch(100% 0 0);
+      --color-scrim: oklch(0% 0 0 / 0.2);
+
+      /* Typografie */
+      --font-body: "Museo Sans", "museo-sans", ui-sans-serif, system-ui, sans-serif;
+      --font-heading: var(--font-body);
+
+      --fs-label: 1.0625rem;                                          /* 17px — Nav/Label, Menu/Label/MD */
+      --fs-brand-stacked: clamp(0.8125rem, 0.726rem + 0.353vw, 0.9375rem); /* 13px → 15px (393 → 960) */
+      --fs-brand-inline: clamp(1rem, 0.45rem + 0.917vw, 1.275rem);   /* 16px → 20.4px (960 → 1440) */
+      --fs-menu-xl: clamp(1.836rem, 1.335rem + 2.042vw, 3.1725rem);   /* 29.38px → 50.76px */
+
+      /* Ruimte */
+      --navbar-h: 4rem;                                               /* 64px mobiel */
+      --navbar-item-pad: 1rem;
+      --navbar-icon: 1.25rem;
+      --menu-pad-inline: clamp(1.5rem, 0.186rem + 5.349vw, 5rem);     /* 24px → 80px */
+      --menu-pad-block: clamp(2rem, 0.36rem + 6.68vw, 5rem);
+      --menu-item-pad: clamp(0.8rem, 0.575rem + 0.917vw, 1.4rem);    /* geeft 62px → 102px rijhoogte */
+      --submenu-pad: 1.5rem;
+      --submenu-gap: 1.5rem;
+      --submenu-w: clamp(18rem, 27.3vw, 24.5625rem);                  /* 393px op 1440 */
+      --menu-max-w: 90rem;                                            /* 1440px designbreedte */
+
+      --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+
+    @media (width >= 60rem) {
+      :root {
+        --navbar-h: 4.5rem;                                           /* 72px desktop */
+        --navbar-item-pad: 1.5rem;
+        --navbar-icon: 1.5rem;
+      }
+    }
+
+    /* ==========================================================
+       Basis
+       ========================================================== */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    html:has(.menu[open]) { overflow: hidden; }
+
+    body {
+      margin: 0;
+      font-family: var(--font-body);
+      font-weight: 300;
+      color: var(--color-ink);
+      background: var(--color-surface);
+    }
+
+    a { color: inherit; }
+    button { font: inherit; color: inherit; }
+    ul { margin: 0; padding: 0; list-style: none; }
+
+    .icon {
+      flex: none;
+      inline-size: var(--icon-size, 1rem);
+      block-size: var(--icon-size, 1rem);
+      fill: currentColor;
+    }
+
+    .visually-hidden {
+      position: absolute !important;
+      inline-size: 1px;
+      block-size: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
+    :focus-visible {
+      outline: 2px solid currentColor;
+      outline-offset: -4px;
+    }
+
+    .skip-link {
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: 0;
+      z-index: 10;
+      padding: 1rem 1.5rem;
+      background: var(--color-ink);
+      color: var(--color-on-ink);
+      translate: 0 -100%;
+    }
+    .skip-link:focus-visible { translate: 0; }
+
+    /* Alleen-mobiel / alleen-desktop varianten van dezelfde content */
+    @media (width >= 60rem) { .hide-desktop { display: none !important; } }
+    @media (width < 60rem) { .hide-mobile { display: none !important; } }
+
+    /* ==========================================================
+       Navbar
+       ========================================================== */
+    .site-header {
+      position: sticky;
+      inset-block-start: 0;
+      z-index: 5;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      block-size: var(--navbar-h);
+      background: var(--color-surface);
+      border-block-end: 1px solid var(--color-line);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      padding-inline: 1rem;
+      text-decoration: none;
+    }
+
+    .brand__wordmark {
+      font-weight: 900;
+      font-size: var(--fs-brand-stacked);
+      line-height: 1.077;                 /* 14/13 */
+      letter-spacing: -0.01em;
+    }
+    .brand__wordmark > span { display: block; }
+
+    @media (width >= 60rem) {
+      .brand { padding-inline: 1.5rem; }
+      .brand__wordmark {
+        font-size: var(--fs-brand-inline);
+        line-height: 1.2;
+        white-space: nowrap;
+      }
+      .brand__wordmark > span { display: inline; }
+    }
+
+    .navbar__items {
+      display: flex;
+      align-items: stretch;
+    }
+
+    .navbar__items > li {
+      position: relative;
+      display: flex;
+    }
+
+    .navbar__item {
+      --icon-size: var(--navbar-icon);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      min-inline-size: 3.5rem;            /* 56px touch target mobiel */
+      padding-inline: var(--navbar-item-pad);
+      border: 0;
+      border-inline-start: 1px solid var(--color-line);
+      background: var(--color-surface);
+      font-size: var(--fs-label);
+      line-height: 1.25rem;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .navbar__item:hover,
+    .navbar__item[aria-expanded="true"] {
+      background: var(--color-line);
+    }
+
+    .navbar__item--current-lang .navbar__label {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    /* Mobiel: alleen iconen, labels voor screenreaders */
+    @media (width < 60rem) {
+      .navbar__label { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    }
+
+    /* Taalkeuze (desktop dropdown) */
+    .lang-list {
+      display: none;
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline-start: 0;
+      min-inline-size: max(100%, 10.6875rem);   /* 171px */
+      background: var(--color-surface);
+    }
+
+    [data-lang-toggle][aria-expanded="true"] + .lang-list { display: block; }
+
+    .lang-list__item {
+      --icon-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      min-block-size: var(--navbar-h);
+      padding: 1rem 1.5rem;
+      border: 1px solid var(--color-line);
+      border-block-start: 0;
+      font-size: var(--fs-label);
+      line-height: 1.25rem;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+    }
+
+    a.lang-list__item:hover { background: var(--color-line); }
+
+    .lang-list__item[aria-current="true"] { text-decoration: underline; text-underline-offset: 0.15em; }
+
+    .lang-list__item--disabled {
+      color: oklch(0% 0 0 / 0.5);
+      text-decoration: line-through;
+    }
+
+    /* Scrim achter de taal-dropdown (annotatie: zwart 20%) */
+    .scrim {
+      position: fixed;
+      inset: var(--navbar-h) 0 0;
+      z-index: 4;
+      background: var(--color-scrim);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* ==========================================================
+       Menu-overlay (native <dialog>: focus-trap, Esc, inert achtergrond)
+       ========================================================== */
+    .menu {
+      inline-size: 100%;
+      block-size: 100dvh;
+      max-inline-size: none;
+      max-block-size: none;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--color-on-ink);
+      opacity: 0;
+      transition:
+        opacity 0.25s var(--ease-out),
+        overlay 0.25s allow-discrete,
+        display 0.25s allow-discrete;
+    }
+
+    .menu[open] {
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+    }
+
+    @starting-style {
+      .menu[open] { opacity: 0; }
+    }
+
+    .menu::backdrop {
+      background: var(--color-scrim);
+      opacity: 0;
+      transition:
+        opacity 0.25s var(--ease-out),
+        overlay 0.25s allow-discrete,
+        display 0.25s allow-discrete;
+    }
+    .menu[open]::backdrop { opacity: 1; }
+    @starting-style {
+      .menu[open]::backdrop { opacity: 0; }
+    }
+
+    /* Balk ter hoogte van de navbar; klik ernaast sluit het menu */
+    .menu__bar {
+      display: flex;
+      justify-content: flex-end;
+      flex: none;
+      block-size: var(--navbar-h);
+    }
+
+    .menu__close {
+      color: var(--color-ink);
+    }
+
+    .menu__panel {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+      min-block-size: 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      /*
+        Max-width zonder extra wrapper: boven --menu-max-w groeit de padding mee,
+        zodat de inhoud gecentreerd binnen die breedte blijft. Het midden van die
+        container is ook het midden van het paneel, dus het submenu (left: 50%) klopt nog.
+      */
+      padding: 2rem max(var(--menu-pad-inline), 50% - var(--menu-max-w) / 2 + var(--menu-pad-inline)) 2.5rem;
+      background: var(--color-ink);
+      translate: 0 0;
+      transition: translate 0.4s var(--ease-out);
+    }
+
+    @starting-style {
+      .menu[open] .menu__panel { translate: 0 -1.5rem; }
+    }
+
+    @media (width >= 60rem) {
+      .menu__panel {
+        justify-content: flex-start;
+        padding-block: var(--menu-pad-block);
+        overflow: visible;
+      }
+      /* 50% van de contentbox = het midden van het paneel; 2rem lucht tot het submenu */
+      .menu__main { max-inline-size: min(52rem, 50% - 2rem); }
+    }
+
+    /* Hoofditems */
+    .menu__main {
+      display: flex;
+      flex-direction: column;
+      max-inline-size: 52rem;             /* 832px menu/menuitem-max-width */
+    }
+
+    .menu__item {
+      display: flex;
+      align-items: center;
+      inline-size: 100%;
+      padding: var(--menu-item-pad) 0;
+      border: 0;
+      border-block-end: 2px solid var(--color-ink);
+      background: none;
+      color: var(--color-on-ink);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: var(--fs-menu-xl);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      text-align: start;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+
+    .menu__item:focus-visible { outline-offset: 4px; }
+
+    /*
+      Hover-variant (styles/item/huge:hover): het vette label rolt omhoog weg,
+      een light-kopie (::after, verborgen voor screenreaders) rolt van onderen in.
+      Beide liggen in dezelfde grid-cel; overflow: clip snijdt af wat buiten valt.
+    */
+    .menu__label {
+      display: inline-grid;
+      overflow: clip;
+    }
+
+    .menu__label > span,
+    .menu__label::after {
+      grid-area: 1 / 1;
+      transition: translate 0.45s var(--ease-out);
+    }
+
+    .menu__label::after {
+      content: attr(data-label);
+      content: attr(data-label) / "";
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      translate: 0 100%;
+    }
+
+    @media (width >= 60rem) and (hover: hover) {
+      .menu__item:hover,
+      .menu__item[aria-expanded="true"] { border-block-end-color: var(--color-line-dark); }
+
+      .menu__item:is(:hover, :focus-visible, [aria-expanded="true"]) .menu__label > span { translate: 0 -100%; }
+      .menu__item:is(:hover, :focus-visible, [aria-expanded="true"]) .menu__label::after { translate: 0 0; }
+    }
+    /* Footer (alleen mobiel): taal + favorieten */
+    .menu__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* ==========================================================
+       Submenu
+       Mobiel: schuift over het hoofdmenu heen (met Terug-knop).
+       Desktop: kolom rechts in het paneel.
+       ========================================================== */
+    .submenu {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: none;
+      flex-direction: column;
+      gap: var(--submenu-gap);
+      padding: var(--submenu-pad);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      background: var(--color-ink);
+      border-inline-start: 2px solid var(--color-line-dark);
+      translate: 0 0;
+      opacity: 1;
+      transition:
+        translate 0.35s var(--ease-out),
+        opacity 0.35s var(--ease-out),
+        display 0.35s allow-discrete;
+    }
+
+    [data-submenu-toggle][aria-expanded="true"] + .submenu { display: flex; }
+
+    @starting-style {
+      [data-submenu-toggle][aria-expanded="true"] + .submenu { translate: 100% 0; }
+    }
+
+    /* Hoofdmenu achter een open submenu onbereikbaar maken op mobiel */
+    @media (width < 60rem) {
+      .menu__panel:has([data-submenu-toggle][aria-expanded="true"]) :is(.menu__item, .menu__footer > *) {
+        visibility: hidden;
+      }
+      .menu__panel:has([data-submenu-toggle][aria-expanded="true"]) [data-submenu-toggle][aria-expanded="true"] + .submenu {
+        visibility: visible;
+      }
+      .menu__panel:has([data-submenu-toggle][aria-expanded="true"]) { overflow: hidden; }
+    }
+
+    @media (width >= 60rem) {
+      .submenu {
+        inset: 0 auto 0 50%;              /* begint op de helft van het paneel */
+        inline-size: var(--submenu-w);
+      }
+      @starting-style {
+        /* Desktop: alleen fade-in, geen slide */
+        [data-submenu-toggle][aria-expanded="true"] + .submenu {
+          translate: 0 0;
+          opacity: 0;
+        }
+      }
+    }
+
+    .submenu__list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--submenu-gap);
+    }
+
+    .submenu__link {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      border: 0;
+      padding: 0;
+      background: none;
+      color: var(--color-on-ink);
+      font-size: var(--fs-label);
+      font-weight: 700;
+      line-height: 1.25rem;
+      letter-spacing: -0.01em;
+      text-align: start;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .submenu__link:hover .submenu__text { text-decoration: underline; text-underline-offset: 0.15em; }
+    .submenu__link:focus-visible { outline-offset: 4px; }
+
+    .submenu__link--light { font-weight: 300; }
+
+    .submenu__link--disabled {
+      color: oklch(100% 0 0 / 0.5);
+      text-decoration: line-through;
+      cursor: default;
+    }
+
+    .submenu__link--current .submenu__text { font-weight: 700; }
+
+    /* Volgorde: mobiel landing bovenaan, desktop onderaan */
+    .submenu__landing { order: -1; }
+    .submenu__back { order: -2; }
+
+    @media (width >= 60rem) {
+      .submenu__landing {
+        order: 0;
+        margin-block-start: auto;
+        font-weight: 300;
+      }
+    }
+
+    /* ==========================================================
+       Demo-content
+       ========================================================== */
+    main {
+      max-inline-size: 60rem;
+      margin-inline: auto;
+      padding: clamp(2rem, 1rem + 4vw, 5rem) clamp(1rem, 0.5rem + 2vw, 2.5rem);
+    }
+
+    main h1 {
+      margin: 0 0 1rem;
+      font-weight: 700;
+      font-size: clamp(1.75rem, 1.2rem + 2.2vw, 3rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+    }
+
+    main p {
+      max-inline-size: 60ch;
+      font-size: var(--fs-label);
+      line-height: 1.5;
+    }
+
+    /* Placeholderblokken zodat de pagina scrollt en de sticky navbar zichtbaar blijft */
+    .placeholder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+      gap: clamp(1rem, 0.5rem + 2vw, 2rem);
+      margin-block-start: clamp(2rem, 1rem + 4vw, 4rem);
+    }
+
+    .placeholder {
+      aspect-ratio: 4 / 3;
+      background: var(--color-line);
+    }
+
+    .placeholder--wide {
+      grid-column: 1 / -1;
+      aspect-ratio: 16 / 7;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after, ::backdrop {
+        transition-duration: 0s !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+    <symbol id="i-lang" viewBox="0 0 24 24"><path d="M17.1 8.55c.41 0 .75.3.75.75v.15h2.25c.41 0 .75.3.75.75 0 .41-.34.75-.75.75h-.08l-.06.17a8.08 8.08 0 0 1-1.49 2.45l.1.06.71.42a.75.75 0 1 1-.77 1.29l-.71-.42c-.17-.1-.36-.2-.49-.32-.39.28-.82.53-1.27.73l-.14.06a.75.75 0 0 1-.61-1.37l.13-.06c.24-.11.47-.26.7-.37l-.46-.46a.75.75 0 0 1 1.06-1.06l.55.55.02-.01c.47-.46.84-1.03 1.12-1.69H14.4c-.45 0-.75-.3-.75-.75 0-.41.3-.75.75-.75h1.95v-.15c0-.41.3-.75.75-.75v.04ZM5.25 12.75 6 11.15l.71 1.6H5.25ZM21.6 4.8A2.4 2.4 0 0 1 24 7.2v9.6a2.4 2.4 0 0 1-2.4 2.4H2.4A2.4 2.4 0 0 1 0 16.8V7.2a2.4 2.4 0 0 1 2.4-2.4h19.2Zm0 1.8H12v10.8h9.6c.33 0 .6-.27.6-.6V7.2c0-.33-.27-.6-.6-.6ZM6.69 9a.75.75 0 0 0-1.38 0l-2.4 5.4a.76.76 0 0 0 .38.99.75.75 0 0 0 .99-.38l.34-.79h2.76l.33.79a.75.75 0 0 0 .99.38.76.76 0 0 0 .38-.99L6.69 9Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><path d="m23.63 22.08-6.28-6.28a9.74 9.74 0 0 0 2.11-6.05C19.46 4.36 15.09 0 9.71 0 4.32 0 0 4.37 0 9.75 0 15.13 4.36 19.5 9.71 19.5c2.29 0 4.38-.79 6.05-2.11l6.28 6.28c.26.22.55.33.84.33.29 0 .58-.11.8-.33.44-.44.44-1.15-.04-1.59ZM2.25 9.75a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="m11.44 3.94.52.56.56-.56a6.76 6.76 0 0 1 5.88-1.87A6.68 6.68 0 0 1 24 8.68v.27c0 1.95-.81 3.81-2.23 5.13l-8.47 7.91a1.9 1.9 0 0 1-2.6 0l-8.47-7.91A7 7 0 0 1 0 8.95v-.27a6.68 6.68 0 0 1 5.6-6.61 6.71 6.71 0 0 1 5.84 1.87Zm.52 3.74-2.11-2.19a4.47 4.47 0 0 0-3.88-1.2 4.43 4.43 0 0 0-3.72 4.39v.27c0 1.32.55 2.59 1.52 3.49L12 20.12l8.24-7.68a4.78 4.78 0 0 0 1.51-3.49v-.27a4.43 4.43 0 0 0-3.72-4.39 4.47 4.47 0 0 0-3.88 1.2l-2.19 2.19Z"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M1.5 4.13C1.5 3.5 2 3 2.63 3h18.75a1.13 1.13 0 0 1 0 2.25H2.63c-.63 0-1.13-.5-1.13-1.12Zm0 7.5c0-.63.5-1.13 1.13-1.13h18.75a1.13 1.13 0 0 1 0 2.25H2.63c-.63 0-1.13-.5-1.13-1.12Zm19.88 8.62H2.63a1.13 1.13 0 0 1 0-2.25h18.75a1.13 1.13 0 0 1 0 2.25Z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M19.13 17.58a1.12 1.12 0 0 1-1.59 1.59L12 13.59l-5.58 5.58a1.12 1.12 0 0 1-1.59-1.59L10.41 12 4.83 6.38A1.12 1.12 0 0 1 6.42 4.79L12 10.41l5.58-5.58a1.12 1.12 0 0 1 1.59 1.59L13.59 12l5.54 5.58Z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 16 16"><path d="m6.54 1.48 5.72 5.97a.74.74 0 0 1 0 1.04l-5.72 5.97a.75.75 0 0 1-1.08-1.04l5.25-5.48-5.25-5.42a.75.75 0 0 1 1.08-1.04Z"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 16 16"><path d="M14.97 8c0 .41-.34.75-.75.75H3.62l4.15 3.96a.75.75 0 0 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.09l5.5-5.25a.75.75 0 0 1 1.04 1.09L3.62 7.25h10.63c.41 0 .72.34.72.75Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#main">Naar de inhoud</a>
+
+  <header class="site-header">
+    <nav class="navbar" aria-label="Hoofdnavigatie">
+      <a class="brand" href="#">
+        <span class="brand__wordmark"><span>Erasmus</span> <span>University</span> <span>Rotterdam</span></span>
+      </a>
+
+      <ul class="navbar__items">
+        <li class="hide-mobile">
+          <button class="navbar__item navbar__item--current-lang" type="button" aria-expanded="false" aria-controls="lang-list" data-lang-toggle>
+            <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+            <span class="navbar__label"><span class="visually-hidden">Taal: </span>NL</span>
+          </button>
+          <ul class="lang-list" id="lang-list">
+            <li>
+              <a class="lang-list__item" href="#" aria-current="true">
+                <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+                Nederlands
+              </a>
+            </li>
+            <li><a class="lang-list__item" href="#" lang="en" hreflang="en">English</a></li>
+            <li>
+              <span class="lang-list__item lang-list__item--disabled" lang="en">Spanish<span class="visually-hidden" lang="nl"> (niet beschikbaar)</span></span>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a class="navbar__item" href="#">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <span class="navbar__label">Zoeken</span>
+          </a>
+        </li>
+        <li class="hide-mobile">
+          <a class="navbar__item" href="#" aria-label="Favorieten">
+            <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+          </a>
+        </li>
+        <li>
+          <button class="navbar__item" type="button" aria-expanded="false" aria-controls="menu" aria-haspopup="dialog" data-menu-open>
+            <svg class="icon" aria-hidden="true"><use href="#i-bars"/></svg>
+            <span class="navbar__label">Menu</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <dialog class="menu" id="menu" aria-label="Menu">
+      <div class="menu__bar">
+        <button class="navbar__item menu__close" type="button" data-menu-close>
+          <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+          <span class="navbar__label">Sluiten</span>
+        </button>
+      </div>
+
+      <div class="menu__panel">
+        <ul class="menu__main">
+          <li>
+            <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-onderwijs" data-submenu-toggle>
+              <span class="menu__label" data-label="Onderwijs"><span>Onderwijs</span></span>
+            </button>
+            <div class="submenu" id="sub-onderwijs">
+              <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                <span class="submenu__text">Terug</span>
+              </button>
+              <ul class="submenu__list">
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Studiekeuze</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Keuzevakken</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Bacheloropleidingen</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Praktische zaken</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Masteropleidingen</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Alumni</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Executive onderwijs</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Voor scholen</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Cursussen</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Studeren in Rotterdam</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Minoren</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Wat kost studeren?</span></a></li>
+              </ul>
+              <a class="submenu__link submenu__landing" href="#">
+                <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                <span class="submenu__text"><span class="hide-desktop">Onderwijs</span><span class="hide-mobile">Alles over onderwijs</span></span>
+              </a>
+            </div>
+          </li>
+          <li>
+            <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-onderzoek" data-submenu-toggle>
+              <span class="menu__label" data-label="Onderzoek"><span>Onderzoek</span></span>
+            </button>
+            <div class="submenu" id="sub-onderzoek">
+              <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                <span class="submenu__text">Terug</span>
+              </button>
+              <ul class="submenu__list">
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Onderzoeksgroepen en -initiatieven</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Erasmus professors</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Extern gefinancierde hoogleraren</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Promoveren aan EUR</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Research services</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Studio Erasmus</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Wetenschapscafé Rotterdam</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Prijzen en onderscheidingen</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Bureau van de Pedel</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Onze onderzoekers</span></a></li>
+              </ul>
+              <a class="submenu__link submenu__landing" href="#">
+                <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                <span class="submenu__text"><span class="hide-desktop">Onderzoek</span><span class="hide-mobile">Alles over onderzoek</span></span>
+              </a>
+            </div>
+          </li>
+          <li>
+            <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-over" data-submenu-toggle>
+              <span class="menu__label" data-label="Over de Universiteit"><span>Over de Universiteit</span></span>
+            </button>
+            <div class="submenu" id="sub-over">
+              <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                <span class="submenu__text">Terug</span>
+              </button>
+              <ul class="submenu__list">
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Visie</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Duurzaamheid</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Evenementen</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">EUR Holding</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Faculteiten</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Feiten en cijfers</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Huisstijl</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Organisatie en bestuur</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Rankings</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Samenwerken</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Strategie 2024</span></a></li>
+                <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Beleid en reglementen</span></a></li>
+              </ul>
+              <a class="submenu__link submenu__landing" href="#">
+                <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                <span class="submenu__text"><span class="hide-desktop">Over de Universiteit</span><span class="hide-mobile">Erasmus Universiteit Rotterdam</span></span>
+              </a>
+            </div>
+          </li>
+          <li><a class="menu__item" href="#"><span class="menu__label" data-label="Werken bij"><span>Werken bij</span></span></a></li>
+          <li><a class="menu__item" href="#"><span class="menu__label" data-label="Nieuws &amp; Agenda"><span>Nieuws &amp; Agenda</span></span></a></li>
+          <li><a class="menu__item" href="#"><span class="menu__label" data-label="Contact"><span>Contact</span></span></a></li>
+        </ul>
+
+        <!-- Annotatie: op mobiel komen taal en favorieten onderin het menu -->
+        <div class="menu__footer hide-desktop">
+          <div>
+            <button class="submenu__link submenu__link--light" type="button" aria-expanded="false" aria-controls="sub-lang" data-submenu-toggle>
+              <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+              <span class="submenu__text"><span class="visually-hidden">Taal: </span>NL</span>
+            </button>
+            <div class="submenu" id="sub-lang">
+              <button class="submenu__link submenu__link--light submenu__back" type="button" data-submenu-back>
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                <span class="submenu__text">Terug</span>
+              </button>
+              <ul class="submenu__list">
+                <li>
+                  <a class="submenu__link submenu__link--light submenu__link--current" href="#" aria-current="true">
+                    <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+                    <span class="submenu__text">Nederlands</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="submenu__link submenu__link--light" href="#" lang="en" hreflang="en">
+                    <span class="icon" aria-hidden="true"></span>
+                    <span class="submenu__text">English</span>
+                  </a>
+                </li>
+                <li>
+                  <span class="submenu__link submenu__link--light submenu__link--disabled" lang="en">
+                    <span class="icon" aria-hidden="true"></span>
+                    <span class="submenu__text">Spanish<span class="visually-hidden" lang="nl"> (niet beschikbaar)</span></span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <a class="submenu__link submenu__link--light" href="#">
+            <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+            <span class="submenu__text">Favorieten</span>
+          </a>
+        </div>
+      </div>
+    </dialog>
+  </header>
+
+  <div class="scrim" data-scrim></div>
+
+  <main id="main">
+    <h1>Prototype hoofdnavigatie</h1>
+    <p>Demo-pagina voor de navbar en het menu uit het EUR.NL Design System 2026. Breakpoint mobiel/desktop ligt op 60rem (960px); menulabels schalen vloeiend van 29px naar 51px.</p>
+
+    <div class="placeholder-grid" aria-hidden="true">
+      <div class="placeholder placeholder--wide"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder placeholder--wide"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder placeholder--wide"></div>
+    </div>
+  </main>
+
+  <script>
+    const desktop = matchMedia('(width >= 60rem)');
+
+    /* ---------- Menu-overlay ---------- */
+    const menu = document.querySelector('#menu');
+    const menuOpen = document.querySelector('[data-menu-open]');
+    const submenuToggles = menu.querySelectorAll('[data-submenu-toggle]');
+
+    const openToggle = () => menu.querySelector('[data-submenu-toggle][aria-expanded="true"]');
+
+    function closeSubmenus() {
+      submenuToggles.forEach((toggle) => toggle.setAttribute('aria-expanded', 'false'));
+    }
+
+    menuOpen.addEventListener('click', () => {
+      menu.showModal();
+      menuOpen.setAttribute('aria-expanded', 'true');
+    });
+
+    menu.querySelector('[data-menu-close]').addEventListener('click', () => menu.close());
+
+    // Klik op de balk (backdrop-strook) of buiten het paneel sluit het menu
+    menu.addEventListener('click', (event) => {
+      if (event.target === menu || event.target.matches('.menu__bar')) menu.close();
+    });
+
+    menu.addEventListener('close', () => {
+      closeSubmenus();
+      menuOpen.setAttribute('aria-expanded', 'false');
+    });
+
+    // Esc sluit eerst een open submenu, pas daarna het menu
+    menu.addEventListener('keydown', (event) => {
+      const toggle = openToggle();
+      if (event.key !== 'Escape' || !toggle) return;
+      event.preventDefault();
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.focus();
+    });
+
+    submenuToggles.forEach((toggle) => {
+      toggle.addEventListener('click', (event) => {
+        clearTimeout(hoverTimer);
+        // Muisklik op desktop opent altijd (hover heeft het mogelijk al geopend); toetsenbord togglet
+        const mouseOnDesktop = desktop.matches && event.pointerType === 'mouse';
+        const willOpen = mouseOnDesktop || toggle.getAttribute('aria-expanded') !== 'true';
+        closeSubmenus();
+        if (!willOpen) return;
+        toggle.setAttribute('aria-expanded', 'true');
+        // Mobiel: submenu bedekt het hoofdmenu, dus focus naar "Terug"
+        if (!desktop.matches) {
+          document.getElementById(toggle.getAttribute('aria-controls')).querySelector('[data-submenu-back]').focus();
+        }
+      });
+    });
+
+    /*
+      Desktop: openen en wisselen gaan direct bij hover. Alleen het sluiten na
+      pointerleave loopt via een korte setTimeout, die bij terugkeer (item of
+      submenu) wordt geannuleerd. Zo knippert het niet als je op de rand van
+      een item zit of even over de grens tussen item en submenu beweegt.
+    */
+    const CLOSE_GRACE = 100;
+    let hoverTimer;
+
+    const isMouseOnDesktop = (event) => event.pointerType === 'mouse' && desktop.matches;
+
+    function scheduleClose() {
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(closeSubmenus, CLOSE_GRACE);
+    }
+
+    menu.querySelectorAll('.menu__main > li > .menu__item').forEach((item) => {
+      item.addEventListener('pointerenter', (event) => {
+        if (!isMouseOnDesktop(event)) return;
+        clearTimeout(hoverTimer);
+        if (openToggle() === item) return;
+        closeSubmenus();
+        if (item.hasAttribute('data-submenu-toggle')) item.setAttribute('aria-expanded', 'true');
+      });
+      item.addEventListener('pointerleave', (event) => {
+        if (isMouseOnDesktop(event)) scheduleClose();
+      });
+    });
+
+    menu.querySelectorAll('.menu__main .submenu').forEach((submenu) => {
+      submenu.addEventListener('pointerenter', (event) => {
+        if (isMouseOnDesktop(event)) clearTimeout(hoverTimer);
+      });
+      submenu.addEventListener('pointerleave', (event) => {
+        if (isMouseOnDesktop(event)) scheduleClose();
+      });
+    });
+
+    menu.addEventListener('close', () => clearTimeout(hoverTimer));
+
+    menu.querySelectorAll('[data-submenu-back]').forEach((back) => {
+      back.addEventListener('click', () => {
+        const toggle = menu.querySelector(`[aria-controls="${back.closest('.submenu').id}"]`);
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      });
+    });
+
+    // Een submenu dat alleen op mobiel bestaat (taal) mag niet openstaan op desktop
+    desktop.addEventListener('change', () => {
+      const toggle = openToggle();
+      if (toggle && !toggle.checkVisibility()) closeSubmenus();
+    });
+
+    /* ---------- Taalkeuze (desktop) ---------- */
+    const langToggle = document.querySelector('[data-lang-toggle]');
+    const langItem = langToggle.closest('li');
+
+    const setLang = (open) => langToggle.setAttribute('aria-expanded', String(open));
+
+    langToggle.addEventListener('click', () => setLang(langToggle.getAttribute('aria-expanded') !== 'true'));
+    document.querySelector('[data-scrim]').addEventListener('click', () => setLang(false));
+
+    langItem.addEventListener('focusout', (event) => {
+      if (!langItem.contains(event.relatedTarget)) setLang(false);
+    });
+
+    langItem.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || langToggle.getAttribute('aria-expanded') !== 'true') return;
+      setLang(false);
+      langToggle.focus();
+    });
+  </script>
+</body>
+</html>
