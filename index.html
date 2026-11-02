@@ -507,16 +507,12 @@
 
     .submenu__link--current .submenu__text { font-weight: 700; }
 
-    /* Volgorde: mobiel landing bovenaan, desktop onderaan */
+    /* Volgorde: landing-link bovenaan de lijst (mobiel onder "Terug") */
     .submenu__landing { order: -1; }
     .submenu__back { order: -2; }
 
     @media (width >= 60rem) {
-      .submenu__landing {
-        order: 0;
-        margin-block-start: auto;
-        font-weight: 300;
-      }
+      .submenu__landing { font-weight: 300; }
     }
 
     /* ==========================================================
