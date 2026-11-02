@@ -508,7 +508,10 @@
     .submenu__link--current .submenu__text { font-weight: 700; }
 
     /* Volgorde: landing-link bovenaan de lijst (mobiel onder "Terug") */
-    .submenu__landing { order: -1; }
+    .submenu__landing {
+      order: -1;
+      margin-block-end: var(--submenu-gap);   /* + flex-gap = dubbele ruimte, leest als titel */
+    }
     .submenu__back { order: -2; }
 
     @media (width >= 60rem) {
