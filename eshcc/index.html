@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Concept, geen officiële EUR-pagina: niet indexeren -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>ESHCC — Hoofdnavigatie prototype</title>
+  <!--
+    Museo Sans staat op Adobe Fonts (museo-sans). Voeg hier de kit toe, bv.:
+    <link rel="stylesheet" href="https://use.typekit.net/XXXXXXX.css">
+    Zonder kit valt de pagina terug op de systeemfont.
+  -->
+  <link rel="stylesheet" href="../assets/nav.css">
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+    <symbol id="i-lang" viewBox="0 0 24 24"><path d="M17.1 8.55c.41 0 .75.3.75.75v.15h2.25c.41 0 .75.3.75.75 0 .41-.34.75-.75.75h-.08l-.06.17a8.08 8.08 0 0 1-1.49 2.45l.1.06.71.42a.75.75 0 1 1-.77 1.29l-.71-.42c-.17-.1-.36-.2-.49-.32-.39.28-.82.53-1.27.73l-.14.06a.75.75 0 0 1-.61-1.37l.13-.06c.24-.11.47-.26.7-.37l-.46-.46a.75.75 0 0 1 1.06-1.06l.55.55.02-.01c.47-.46.84-1.03 1.12-1.69H14.4c-.45 0-.75-.3-.75-.75 0-.41.3-.75.75-.75h1.95v-.15c0-.41.3-.75.75-.75v.04ZM5.25 12.75 6 11.15l.71 1.6H5.25ZM21.6 4.8A2.4 2.4 0 0 1 24 7.2v9.6a2.4 2.4 0 0 1-2.4 2.4H2.4A2.4 2.4 0 0 1 0 16.8V7.2a2.4 2.4 0 0 1 2.4-2.4h19.2Zm0 1.8H12v10.8h9.6c.33 0 .6-.27.6-.6V7.2c0-.33-.27-.6-.6-.6ZM6.69 9a.75.75 0 0 0-1.38 0l-2.4 5.4a.76.76 0 0 0 .38.99.75.75 0 0 0 .99-.38l.34-.79h2.76l.33.79a.75.75 0 0 0 .99.38.76.76 0 0 0 .38-.99L6.69 9Z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><path d="m23.63 22.08-6.28-6.28a9.74 9.74 0 0 0 2.11-6.05C19.46 4.36 15.09 0 9.71 0 4.32 0 0 4.37 0 9.75 0 15.13 4.36 19.5 9.71 19.5c2.29 0 4.38-.79 6.05-2.11l6.28 6.28c.26.22.55.33.84.33.29 0 .58-.11.8-.33.44-.44.44-1.15-.04-1.59ZM2.25 9.75a7.5 7.5 0 1 1 15 0 7.5 7.5 0 0 1-15 0Z"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="m11.44 3.94.52.56.56-.56a6.76 6.76 0 0 1 5.88-1.87A6.68 6.68 0 0 1 24 8.68v.27c0 1.95-.81 3.81-2.23 5.13l-8.47 7.91a1.9 1.9 0 0 1-2.6 0l-8.47-7.91A7 7 0 0 1 0 8.95v-.27a6.68 6.68 0 0 1 5.6-6.61 6.71 6.71 0 0 1 5.84 1.87Zm.52 3.74-2.11-2.19a4.47 4.47 0 0 0-3.88-1.2 4.43 4.43 0 0 0-3.72 4.39v.27c0 1.32.55 2.59 1.52 3.49L12 20.12l8.24-7.68a4.78 4.78 0 0 0 1.51-3.49v-.27a4.43 4.43 0 0 0-3.72-4.39 4.47 4.47 0 0 0-3.88 1.2l-2.19 2.19Z"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M1.5 4.13C1.5 3.5 2 3 2.63 3h18.75a1.13 1.13 0 0 1 0 2.25H2.63c-.63 0-1.13-.5-1.13-1.12Zm0 7.5c0-.63.5-1.13 1.13-1.13h18.75a1.13 1.13 0 0 1 0 2.25H2.63c-.63 0-1.13-.5-1.13-1.12Zm19.88 8.62H2.63a1.13 1.13 0 0 1 0-2.25h18.75a1.13 1.13 0 0 1 0 2.25Z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M19.13 17.58a1.12 1.12 0 0 1-1.59 1.59L12 13.59l-5.58 5.58a1.12 1.12 0 0 1-1.59-1.59L10.41 12 4.83 6.38A1.12 1.12 0 0 1 6.42 4.79L12 10.41l5.58-5.58a1.12 1.12 0 0 1 1.59 1.59L13.59 12l5.54 5.58Z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 16 16"><path d="m6.54 1.48 5.72 5.97a.74.74 0 0 1 0 1.04l-5.72 5.97a.75.75 0 0 1-1.08-1.04l5.25-5.48-5.25-5.42a.75.75 0 0 1 1.08-1.04Z"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 16 16"><path d="M14.97 8c0 .41-.34.75-.75.75H3.62l4.15 3.96a.75.75 0 0 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.09l5.5-5.25a.75.75 0 0 1 1.04 1.09L3.62 7.25h10.63c.41 0 .72.34.72.75Z"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#main">Naar de inhoud</a>
+
+  <header class="site-header">
+    <nav class="navbar" aria-label="Hoofdnavigatie">
+      <a class="brand brand--long" href="#">
+        <span class="brand__wordmark"><span>Erasmus School of</span> <span>History, Culture and</span> <span>Communication</span></span>
+      </a>
+
+      <ul class="navbar__items">
+        <li class="hide-mobile">
+          <button class="navbar__item navbar__item--current-lang" type="button" aria-expanded="false" aria-controls="lang-list" data-lang-toggle>
+            <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+            <span class="navbar__label"><span class="visually-hidden">Taal: </span>NL</span>
+          </button>
+          <ul class="lang-list" id="lang-list">
+            <li>
+              <a class="lang-list__item" href="#" aria-current="true">
+                <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+                Nederlands
+              </a>
+            </li>
+            <li><a class="lang-list__item" href="#" lang="en" hreflang="en">English</a></li>
+            <li>
+              <span class="lang-list__item lang-list__item--disabled" lang="en">Spanish<span class="visually-hidden" lang="nl"> (niet beschikbaar)</span></span>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a class="navbar__item" href="#">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <span class="navbar__label">Zoeken</span>
+          </a>
+        </li>
+        <li class="hide-mobile">
+          <a class="navbar__item" href="#" aria-label="Favorieten">
+            <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+          </a>
+        </li>
+        <li>
+          <button class="navbar__item" type="button" aria-expanded="false" aria-controls="menu" aria-haspopup="dialog" data-menu-open>
+            <svg class="icon" aria-hidden="true"><use href="#i-bars"/></svg>
+            <span class="navbar__label">Menu</span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <dialog class="menu" id="menu" aria-label="Menu">
+      <div class="menu__bar">
+        <button class="navbar__item menu__close" type="button" data-menu-close>
+          <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+          <span class="navbar__label">Sluiten</span>
+        </button>
+      </div>
+
+      <div class="menu__panel">
+        <div class="menu__scroll">
+          <ul class="menu__main">
+            <li>
+              <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-onderwijs" data-submenu-toggle>
+                <span class="menu__label" data-label="Onderwijs"><span>Onderwijs</span></span>
+              </button>
+              <div class="submenu" id="sub-onderwijs">
+                <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span class="submenu__text">Terug</span>
+                </button>
+                <a class="submenu__link submenu__landing" href="#">
+                  <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                  <span class="submenu__text"><span class="hide-desktop">Onderwijs</span><span class="hide-mobile">Alles over onderwijs</span></span>
+                </a>
+                <ul class="submenu__list">
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Studiekeuze</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Bachelors</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Pre-masters</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Masters</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Minoren</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Overig onderwijs</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">MOOC</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Praktische zaken</span></a></li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-onderzoek" data-submenu-toggle>
+                <span class="menu__label" data-label="Onderzoek"><span>Onderzoek</span></span>
+              </button>
+              <div class="submenu" id="sub-onderzoek">
+                <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span class="submenu__text">Terug</span>
+                </button>
+                <a class="submenu__link submenu__landing" href="#">
+                  <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                  <span class="submenu__text"><span class="hide-desktop">Onderzoek</span><span class="hide-mobile">Alles over onderzoek</span></span>
+                </a>
+                <ul class="submenu__list">
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Derius</span></a></li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-over" data-submenu-toggle>
+                <span class="menu__label" data-label="Over ESHCC"><span>Over ESHCC</span></span>
+              </button>
+              <div class="submenu" id="sub-over">
+                <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span class="submenu__text">Terug</span>
+                </button>
+                <a class="submenu__link submenu__landing" href="#">
+                  <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                  <span class="submenu__text"><span class="hide-desktop">Over ESHCC</span><span class="hide-mobile">Alles over ESHCC</span></span>
+                </a>
+                <ul class="submenu__list">
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Onze faculteit</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Organisatie</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Afdelingen</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Medezeggenschap</span></a></li>
+                </ul>
+              </div>
+            </li>
+            <li><a class="menu__item" href="#"><span class="menu__label" data-label="Samenwerken"><span>Samenwerken</span></span></a></li>
+            <li><a class="menu__item" href="#"><span class="menu__label" data-label="Alumni"><span>Alumni</span></span></a></li>
+            <li>
+              <button class="menu__item" type="button" aria-expanded="false" aria-controls="sub-campus" data-submenu-toggle>
+                <span class="menu__label" data-label="Campus"><span>Campus</span></span>
+              </button>
+              <div class="submenu" id="sub-campus">
+                <button class="submenu__link submenu__link--light submenu__back hide-desktop" type="button" data-submenu-back>
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span class="submenu__text">Terug</span>
+                </button>
+                <a class="submenu__link submenu__landing" href="#">
+                  <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg>
+                  <span class="submenu__text"><span class="hide-desktop">Campus</span><span class="hide-mobile">Alles over de campus</span></span>
+                </a>
+                <ul class="submenu__list">
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Locaties</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Universiteitsbibliotheek</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Toegankelijkheid</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Cultuur</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Sport</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Beveiliging &amp; veiligheid</span></a></li>
+                  <li><a class="submenu__link" href="#"><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span class="submenu__text">Erasmus Food Plaza</span></a></li>
+                </ul>
+              </div>
+            </li>
+            <li><a class="menu__item" href="#"><span class="menu__label" data-label="Contact"><span>Contact</span></span></a></li>
+            <li><a class="menu__item" href="#"><span class="menu__label" data-label="Werken bij"><span>Werken bij</span></span></a></li>
+          </ul>
+
+          <!-- Annotatie: op mobiel komen taal en favorieten onderin het menu -->
+          <div class="menu__footer hide-desktop">
+            <div>
+              <button class="submenu__link submenu__link--light" type="button" aria-expanded="false" aria-controls="sub-lang" data-submenu-toggle>
+                <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+                <span class="submenu__text"><span class="visually-hidden">Taal: </span>NL</span>
+              </button>
+              <div class="submenu" id="sub-lang">
+                <button class="submenu__link submenu__link--light submenu__back" type="button" data-submenu-back>
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow-left"/></svg>
+                  <span class="submenu__text">Terug</span>
+                </button>
+                <ul class="submenu__list">
+                  <li>
+                    <a class="submenu__link submenu__link--light submenu__link--current" href="#" aria-current="true">
+                      <svg class="icon" aria-hidden="true"><use href="#i-lang"/></svg>
+                      <span class="submenu__text">Nederlands</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="submenu__link submenu__link--light" href="#" lang="en" hreflang="en">
+                      <span class="icon" aria-hidden="true"></span>
+                      <span class="submenu__text">English</span>
+                    </a>
+                  </li>
+                  <li>
+                    <span class="submenu__link submenu__link--light submenu__link--disabled" lang="en">
+                      <span class="icon" aria-hidden="true"></span>
+                      <span class="submenu__text">Spanish<span class="visually-hidden" lang="nl"> (niet beschikbaar)</span></span>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <a class="submenu__link submenu__link--light" href="#">
+              <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg>
+              <span class="submenu__text">Favorieten</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </dialog>
+  </header>
+
+  <div class="scrim" data-scrim></div>
+
+  <main id="main">
+    <h1>Prototype hoofdnavigatie — ESHCC</h1>
+    <p>Variant met het grotere hoofdmenu van de Erasmus School of History, Culture and Communication (8 items). Bedoeld om lange faculteitsnamen en overflow op lage schermen te testen. Terug naar de <a href="../">EUR-variant</a>.</p>
+
+    <div class="placeholder-grid" aria-hidden="true">
+      <div class="placeholder placeholder--wide"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder placeholder--wide"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder"></div>
+      <div class="placeholder placeholder--wide"></div>
+    </div>
+  </main>
+
+  <script src="../assets/nav.js"></script>
+</body>
+</html>
