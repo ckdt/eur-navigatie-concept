@@ -461,12 +461,19 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
   Gewone links (geen submenu): witte underline bij hover/focus. Als
   achtergrond-gradient onderin het label in plaats van text-decoration,
   omdat overflow: clip een echte underline zou afsnijden. Verschijnt direct.
+  De lijn zit op beide tekstlagen (vet + light-kopie) en die zijn elk zo
+  breed als hun eigen tekst (justify-self: start), zodat de lijn precies
+  zo lang is als de tekst die op dat moment in beeld is. De laag die
+  weggerold is, valt buiten de clip, inclusief zijn lijn.
 */
-a.menu__item .menu__label {
+a.menu__item .menu__label > span,
+a.menu__item .menu__label::after {
+  justify-self: start;
   background: linear-gradient(currentColor 0 0) no-repeat left bottom / 0 max(2px, 0.05em);
 }
 
-a.menu__item:is(:hover, :focus-visible) .menu__label {
+a.menu__item:is(:hover, :focus-visible) .menu__label > span,
+a.menu__item:is(:hover, :focus-visible) .menu__label::after {
   background-size: 100% max(2px, 0.05em);
 }
 
