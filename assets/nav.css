@@ -31,6 +31,10 @@
   --submenu-gap: 1.5rem;
   --submenu-w: clamp(18rem, 27.3vw, 24.5625rem);                  /* 393px op 1440 */
   --menu-max-w: 90rem;                                            /* 1440px designbreedte */
+  --menu-scroll-pad-block: min(var(--menu-pad-block), 8dvh);      /* desktop: ruimte boven/onder hoofdmenu */
+
+  /* Effectieve grootte hoofdmenu; op mobiel gelijk aan de breedte-schaal */
+  --fs-menu-main: var(--fs-menu-xl);
 
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
@@ -40,6 +44,26 @@
     --navbar-h: 4.5rem;                                           /* 72px desktop */
     --navbar-item-pad: 1.5rem;
     --navbar-icon: 1.5rem;
+
+    /*
+      Hoofdmenu past zich ook aan de schermhoogte aan, zodat --menu-fit-items
+      items zonder scrollen passen.
+      - Item-padding schaalt mee met de lettergrootte: 0.44 × font-size
+        (design: 22.4px bij 50.76px). Rijhoogte = 1.12 + 2 × 0.44 = 2 × font-size, + 2px border.
+      - Beschikbare hoogte = viewport − navbar − ruimte boven/onder het menu.
+      - Dus: font-size ≤ (beschikbare hoogte / aantal items − 2px) / 2.
+        (We trekken 4px af: 2px border + 2px speling tegen afrondingen.)
+      clamp(): nooit kleiner dan 24px (daaronder scrollt het menu),
+      nooit groter dan de breedte-schaal uit het design (--fs-menu-xl).
+    */
+    --menu-fit-items: 8;
+    --menu-fit-h: calc(100dvh - var(--navbar-h) - 2 * var(--menu-scroll-pad-block));
+    --fs-menu-main: clamp(
+      1.5rem,
+      (var(--menu-fit-h) / var(--menu-fit-items) - 4px) / 2,
+      var(--fs-menu-xl)
+    );
+    --menu-item-pad: calc(var(--fs-menu-main) * 0.44);
   }
 }
 
@@ -355,7 +379,7 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
   .menu__scroll {
     justify-content: flex-start;
     /* Op lage schermen minder witruimte boven/onder, zodat er meer items passen */
-    padding-block: min(var(--menu-pad-block), 8dvh);
+    padding-block: var(--menu-scroll-pad-block);
   }
 }
 
@@ -373,6 +397,7 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
 }
 
 .menu__item {
+  position: relative;
   display: flex;
   align-items: center;
   inline-size: 100%;
@@ -383,7 +408,7 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
   color: var(--color-on-ink);
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: var(--fs-menu-xl);
+  font-size: var(--fs-menu-main);
   line-height: 1.12;
   letter-spacing: -0.03em;
   text-align: start;
@@ -393,6 +418,35 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
 }
 
 .menu__item:focus-visible { outline-offset: 4px; }
+
+/*
+  Chevron vóór hoofditems die direct een link zijn (geen submenu), net als
+  de links in het submenu. Hij hangt absoluut in de marge links van het
+  label, zodat alle labels op één lijn blijven, met of zonder chevron.
+  Via mask, dus zonder extra markup; decoratief voor screenreaders.
+*/
+a.menu__item::before {
+  content: "";
+  position: absolute;
+  inset-inline-end: calc(100% + 0.25em);
+  inset-block-start: 50%;
+  inline-size: 0.4em;
+  block-size: 0.4em;
+  translate: 0 -50%;
+  background-color: var(--color-line-dark);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m6.54 1.48 5.72 5.97a.74.74 0 0 1 0 1.04l-5.72 5.97a.75.75 0 0 1-1.08-1.04l5.25-5.48-5.25-5.42a.75.75 0 0 1 1.08-1.04Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition:
+    translate 0.3s var(--ease-out),
+    background-color 0.3s;
+}
+
+a.menu__item:is(:hover, :focus-visible)::before {
+  background-color: var(--color-on-ink);
+}
+
+@media (width >= 60rem) and (hover: hover) {
+  a.menu__item:hover::before { translate: 0.15em -50%; }
+}
 
 /*
   Hover-variant (styles/item/huge:hover): het vette label rolt omhoog weg,
@@ -419,8 +473,8 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
 }
 
 @media (width >= 60rem) and (hover: hover) {
-  .menu__item:hover,
-  .menu__item[aria-expanded="true"] { border-block-end-color: var(--color-line-dark); }
+  /* Lijn alleen bij items met een submenu; gewone links krijgen de chevron als hint */
+  .menu__item[data-submenu-toggle]:is(:hover, [aria-expanded="true"]) { border-block-end-color: var(--color-line-dark); }
 
   .menu__item:is(:hover, :focus-visible, [aria-expanded="true"]) .menu__label > span { translate: 0 -100%; }
   .menu__item:is(:hover, :focus-visible, [aria-expanded="true"]) .menu__label::after { translate: 0 0; }
@@ -477,6 +531,15 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
 @media (width >= 60rem) {
   .submenu {
     inset: 0 auto 0 50%;              /* begint op de helft van het paneel */
+    /*
+      Eerste link op één lijn met het eerste hoofditem: zelfde afstand als
+      de scroll-padding + item-padding, plus het verschil in regelhoogte / 2
+      (menulabel 1.12 × font-size vs. 1.25rem), zodat de middens samenvallen.
+    */
+    padding-block-start: calc(
+      var(--menu-scroll-pad-block) + var(--menu-item-pad)
+      + (var(--fs-menu-main) * 1.12 - 1.25rem) / 2
+    );
     inline-size: var(--submenu-w);
   }
   @starting-style {
