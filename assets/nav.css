@@ -400,6 +400,7 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
   position: relative;
   display: flex;
   align-items: center;
+  column-gap: 0.3em;
   inline-size: 100%;
   padding: var(--menu-item-pad) 0;
   border: 0;
@@ -420,32 +421,30 @@ html:has([data-lang-toggle][aria-expanded="true"]) .scrim {
 .menu__item:focus-visible { outline-offset: 4px; }
 
 /*
-  Chevron vóór hoofditems die direct een link zijn (geen submenu), net als
-  de links in het submenu. Hij hangt absoluut in de marge links van het
-  label, zodat alle labels op één lijn blijven, met of zonder chevron.
-  Via mask, dus zonder extra markup; decoratief voor screenreaders.
+  Pijl direct achter het label van hoofditems met een submenu (flex-item na
+  het label). Via mask (de arrow-left uit de sprite, gespiegeld), dus zonder
+  extra markup; decoratief: aria-expanded vertelt screenreaders al dat er
+  een submenu is.
 */
-a.menu__item::before {
+.menu__item[data-submenu-toggle]::after {
   content: "";
-  position: absolute;
-  inset-inline-end: calc(100% + 0.25em);
-  inset-block-start: 50%;
-  inline-size: 0.4em;
-  block-size: 0.4em;
-  translate: 0 -50%;
+  flex: none;
+  inline-size: 0.45em;
+  block-size: 0.45em;
+  margin-inline-start: auto;          /* naar het eind van de regel; column-gap op het item houdt minimale afstand */
   background-color: var(--color-line-dark);
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m6.54 1.48 5.72 5.97a.74.74 0 0 1 0 1.04l-5.72 5.97a.75.75 0 0 1-1.08-1.04l5.25-5.48-5.25-5.42a.75.75 0 0 1 1.08-1.04Z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath transform='matrix(-1 0 0 1 16 0)' d='M14.97 8c0 .41-.34.75-.75.75H3.62l4.15 3.96a.75.75 0 0 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.09l5.5-5.25a.75.75 0 0 1 1.04 1.09L3.62 7.25h10.63c.41 0 .72.34.72.75Z'/%3E%3C/svg%3E") center / contain no-repeat;
   transition:
     translate 0.3s var(--ease-out),
     background-color 0.3s;
 }
 
-a.menu__item:is(:hover, :focus-visible)::before {
+.menu__item[data-submenu-toggle]:is(:hover, :focus-visible, [aria-expanded="true"])::after {
   background-color: var(--color-on-ink);
 }
 
 @media (width >= 60rem) and (hover: hover) {
-  a.menu__item:hover::before { translate: 0.15em -50%; }
+  .menu__item[data-submenu-toggle]:is(:hover, [aria-expanded="true"])::after { translate: 0.15em 0; }
 }
 
 /*
@@ -456,6 +455,19 @@ a.menu__item:is(:hover, :focus-visible)::before {
 .menu__label {
   display: inline-grid;
   overflow: clip;
+}
+
+/*
+  Gewone links (geen submenu): witte underline bij hover/focus. Als
+  achtergrond-gradient onderin het label in plaats van text-decoration,
+  omdat overflow: clip een echte underline zou afsnijden. Verschijnt direct.
+*/
+a.menu__item .menu__label {
+  background: linear-gradient(currentColor 0 0) no-repeat left bottom / 0 max(2px, 0.05em);
+}
+
+a.menu__item:is(:hover, :focus-visible) .menu__label {
+  background-size: 100% max(2px, 0.05em);
 }
 
 .menu__label > span,
@@ -473,7 +485,7 @@ a.menu__item:is(:hover, :focus-visible)::before {
 }
 
 @media (width >= 60rem) and (hover: hover) {
-  /* Lijn alleen bij items met een submenu; gewone links krijgen de chevron als hint */
+  /* Groene rijlijn alleen bij items met een submenu; gewone links krijgen een witte underline */
   .menu__item[data-submenu-toggle]:is(:hover, [aria-expanded="true"]) { border-block-end-color: var(--color-line-dark); }
 
   .menu__item:is(:hover, :focus-visible, [aria-expanded="true"]) .menu__label > span { translate: 0 -100%; }
